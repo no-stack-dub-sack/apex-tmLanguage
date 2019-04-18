@@ -1658,6 +1658,15 @@ repository:
 
   comment:
     patterns:
+    - name: comment.block.documentation.apex
+      begin: /\*\*(?!/)
+      beginCaptures:
+        '0': { name: punctuation.definition.comment.apex }
+      end: \*/
+      endCaptures:
+        '0': { name: punctuation.definition.comment.apex }
+      patterns:
+      - include: '#apex-doc-comment'
     - name: comment.block.apex
       begin: /\*+
       beginCaptures:
@@ -1682,6 +1691,23 @@ repository:
         beginCaptures:
           '0': { name: punctuation.definition.comment.apex }
         end: (?=$)
+
+  apex-doc-comment:
+    patterns:
+    - match: "(?:(@)(author|date|deprecated|description|example|group|group-content|return|see))(?=\\s+)"
+      captures:
+        '0':
+          name: punctuation.accessor.apex
+        '2':
+          name: storage.type.annotation.apex
+    - match: "(?:(@)(param\\s+([_[:alpha:][:alnum:]]+)))(?=\\s+)"
+      captures:
+        '0':
+          name: punctuation.accessor.apex
+        '2':
+          name: storage.type.annotation.apex
+        '3':
+          name: keyword.other.class.apex
 
   xml-doc-comment:
     patterns:
