@@ -1696,6 +1696,7 @@ repository:
     patterns:
     - include: '#apex-doc-tags'
     - include: '#apex-doc-inline-code'
+    - include: '#apex-doc-break'
 
   apex-doc-tags:
     patterns:
@@ -1788,6 +1789,13 @@ repository:
             name: source.embedded.apex
             patterns:
             - include: source.apex
+
+  apex-doc-break:
+    name: meta.tag.apex
+    patterns:
+    - match: (<br\s?/?>)
+    - captures:
+        '0': { name: punctuation.definition.tag.apex }
 
   apex-doc-inline-code:
     name: meta.example.apex
