@@ -1694,13 +1694,18 @@ repository:
 
   apex-doc-comment:
     patterns:
-    - match: "(?:(@)(author|date|deprecated|description|example|group|group-content|return|see))(?=\\s+)"
+    - include: '#apex-doc-tags'
+    - include: '#apex-doc-inline-code'
+
+  apex-doc-tags:
+    patterns:
+    - match: (?:(@)(author|date|deprecated|description|example|group|group-content|return))(?=\s+)
       captures:
         '0':
           name: punctuation.accessor.apex
         '2':
           name: storage.type.annotation.apex
-    - match: "(?:(@)(param\\s+([_[:alpha:][:alnum:]]+)))(?=\\s+)"
+    - match: (?:(@)(param)\b\s*(([_[:alnum:]]+)))(?=\s+)
       captures:
         '0':
           name: punctuation.accessor.apex
@@ -1708,6 +1713,81 @@ repository:
           name: storage.type.annotation.apex
         '3':
           name: keyword.other.class.apex
+    - match: |-
+        (?x)
+        (?:
+          (@)
+          (see)\b\s*
+          # match dot notation name path
+          (
+            [._[:alnum:]]*
+            # match overload link syntax, e.g. Class.Method[4]
+            (
+              (\[)
+                [[:digit:]]+
+              (\])
+            )?
+          )
+          |
+          (
+            # match URLs
+            (?=https?://)
+            (?:[^\s*]|\*[^/])+
+          )
+          |
+          (?:
+            # match markdown style URLs
+            (
+              (\[)
+                [._[:alnum:]]*
+              (\])
+            )
+            (
+              (\()
+                (?=https?://)
+                (?:[^\s*]|\*[^/])+
+              (\))
+            )
+          )
+        )
+        (?=\s+)
+      captures:
+        '1':
+          name: punctuation.accessor.apex
+        '2':
+          name: storage.type.annotation.apex
+        '3':
+          name: support.class.apex
+        '4':
+          name: keyword.other.class.apex
+        '5':
+          name: punctuation.accessor.apex
+        '6':
+          name: punctuation.accessor.apex
+        '7':
+          name: variable.other.object.property.apex
+        '8':
+          name: keyword.other.class.apex
+        '9':
+          name: punctuation.accessor.apex
+        '10':
+          name: punctuation.accessor.apex
+        '11':
+          name: variable.other.object.property.apex
+        '12':
+          name: punctuation.accessor.apex
+        '13':
+          name: punctuation.accessor.apex
+
+  apex-doc-inline-code:
+    name: meta.tag.apex
+    begin: (`)(?:([.\(\)\[\]\s='"|;\+\-\*\!\&\@{}%_#$<>,:\\/\?^[:alnum:]]+))
+    beginCaptures:
+      '1': { name: punctuation.definition.tag.apex }
+      '2': { name: entity.name.tag.apex }
+    end: (`?)
+    endCaptures:
+      '1': { name: punctuation.definition.tag.apex }
 
   xml-doc-comment:
     patterns:
