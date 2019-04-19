@@ -1700,15 +1700,33 @@ repository:
 
   apex-doc-tags:
     patterns:
+    # standard @tags
     - match: ((@)(author|date|deprecated|description|group|group-content|return))(?=\s+)
       captures:
         '1': { name: storage.type.annotation.apex }
         '2': { name: punctuation.accessor.apex }
+    # Currently unsupported @tags, which may be supprted in the future.
+    # Prevents PRs to this repo each time ApexDoc2 is updated
+    - match: |-
+        (?x)
+        ((@)
+          (
+            abstract|access|augments|async|borrows|constructs|copyright|constant|default|
+            event|external|file|fires|generator|ignore|inner|instance|kind|lends|license|
+            listens|member|memberof|mixes|module|name|namespace|override|package|readonly|
+            since|static|todo|tutorial|variation|virtual
+          )
+        )(?=\s+)
+      captures:
+        '1': { name: storage.type.annotation.apex }
+        '2': { name: punctuation.accessor.apex }
+    # @param paramName
     - match: (?:(@)(param)\b\s*(([_[:alnum:]]*)))(?=\s+)
       captures:
         '0': { name: punctuation.accessor.apex }
         '2': { name: storage.type.annotation.apex }
         '3': { name: keyword.other.class.apex }
+    # @see URL or namePath
     - match: |-
         (?x)
         (?:
@@ -1760,6 +1778,9 @@ repository:
         '11': { name: variable.other.object.property.apex }
         '12': { name: punctuation.accessor.apex }
         '13': { name: punctuation.accessor.apex }
+    # @example codeExample
+    # Should be the last tag; we can't end matching on next @
+    # because code example could contain Apex annotations
     - name: meta.example.apex
       begin: ((@)example)\s+
       end: (?=\*/)
@@ -1794,8 +1815,8 @@ repository:
     name: meta.tag.apex
     patterns:
     - match: (<br\s?/?>)
-    - captures:
-        '0': { name: punctuation.definition.tag.apex }
+      captures:
+          '0': { name: punctuation.definition.tag.apex }
 
   apex-doc-inline-code:
     name: meta.example.apex
