@@ -1699,25 +1699,19 @@ repository:
 
   apex-doc-tags:
     patterns:
-    - match: (?:(@)(author|date|deprecated|description|example|group|group-content|return))(?=\s+)
+    - match: ((@)(author|date|deprecated|description|group|group-content|return))(?=\s+)
       captures:
-        '0':
-          name: punctuation.accessor.apex
-        '2':
-          name: storage.type.annotation.apex
-    - match: (?:(@)(param)\b\s*(([_[:alnum:]]+)))(?=\s+)
+        '1': { name: storage.type.annotation.apex }
+        '2': { name: punctuation.accessor.apex }
+    - match: (?:(@)(param)\b\s*(([_[:alnum:]]*)))(?=\s+)
       captures:
-        '0':
-          name: punctuation.accessor.apex
-        '2':
-          name: storage.type.annotation.apex
-        '3':
-          name: keyword.other.class.apex
+        '0': { name: punctuation.accessor.apex }
+        '2': { name: storage.type.annotation.apex }
+        '3': { name: keyword.other.class.apex }
     - match: |-
         (?x)
         (?:
-          (@)
-          (see)\b\s*
+          ((@)see)\b\s*
           # match dot notation name path
           (
             [._[:alnum:]]*
@@ -1739,7 +1733,7 @@ repository:
             # match markdown style URLs
             (
               (\[)
-                [._[:alnum:]]*
+                [._\s[:alnum:]]*
               (\])
             )
             (
@@ -1752,36 +1746,52 @@ repository:
         )
         (?=\s+)
       captures:
-        '1':
-          name: punctuation.accessor.apex
-        '2':
-          name: storage.type.annotation.apex
-        '3':
-          name: support.class.apex
-        '4':
-          name: keyword.other.class.apex
-        '5':
-          name: punctuation.accessor.apex
-        '6':
-          name: punctuation.accessor.apex
-        '7':
-          name: variable.other.object.property.apex
-        '8':
-          name: keyword.other.class.apex
-        '9':
-          name: punctuation.accessor.apex
-        '10':
-          name: punctuation.accessor.apex
-        '11':
-          name: variable.other.object.property.apex
-        '12':
-          name: punctuation.accessor.apex
-        '13':
-          name: punctuation.accessor.apex
+        '1': { name: storage.type.annotation.apex }
+        '2': { name: punctuation.accessor.apex }
+        '3': { name: support.class.apex }
+        '4': { name: keyword.other.class.apex }
+        '5': { name: punctuation.accessor.apex }
+        '6': { name: punctuation.accessor.apex }
+        '7': { name: variable.other.object.property.apex }
+        '8': { name: keyword.other.class.apex }
+        '9': { name: punctuation.accessor.apex }
+        '10': { name: punctuation.accessor.apex }
+        '11': { name: variable.other.object.property.apex }
+        '12': { name: punctuation.accessor.apex }
+        '13': { name: punctuation.accessor.apex }
+    - name: meta.example.apex
+      begin: ((@)example)\s+
+      end: (?=\*/)
+      beginCaptures:
+        '1': { name: storage.type.annotation.apex }
+        '2': { name: punctuation.accessor.apex }
+      patterns:
+      # Match closing bracket on its own line. Not highlighting with embedded for some reason
+      - match: (?:^\s+(\*)\s+(})(;)?)
+        captures:
+          '1': { name: punctuation.definition.comment.apex }
+          '2': { name: punctuation.curlybrace.close.apex }
+          '3': { name: punctuation.terminator.statement.apex }
+      # Match annotations inside examples, they highlight funny with embedded highlighting
+      - match: (^\s+(\*)\s+@[_[:alpha:]]+\b)
+        captures:
+          '1': { name: storage.type.annotation.apex }
+          '2': { name: punctuation.definition.comment.apex }
+      # Highlight leading asterisk as comment still
+      - match: (^\s+\*\s+)
+        captures:
+          '0': { name: punctuation.definition.comment.apex }
+      # Highlight Apex example
+      - match: '[^\s@*](?:[^*]|\*[^/])*'
+        captures:
+          '0':
+            name: source.embedded.apex
+            patterns:
+            - include: source.apex
 
   apex-doc-inline-code:
-    name: meta.tag.apex
-    begin: (`)(?:([.\(\)\[\]\s='"|;\+\-\*\!\&\@{}%_#$<>,:\\/\?^[:alnum:]]+))
+    name: meta.example.apex
+    begin: (`)([^\s@*](?:[^*`]|\*[^/])+)
     beginCaptures:
       '1': { name: punctuation.definition.tag.apex }
       '2': { name: entity.name.tag.apex }
