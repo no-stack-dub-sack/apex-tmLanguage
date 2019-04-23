@@ -1700,33 +1700,34 @@ repository:
 
   apex-doc-tags:
     patterns:
-    # standard @tags
-    - match: ((@)(author|date|deprecated|description|group|group-content|return))(?=\s+)
+    # standard ApexDoc tags
+    - match: >-
+        ((@)(author|deprecated|description|exception|group|group-content|returns|since))(?=\s+)
       captures:
         '1': { name: storage.type.annotation.apex }
         '2': { name: punctuation.accessor.apex }
-    # Currently unsupported @tags, which may be supprted in the future.
-    # Prevents PRs to this repo each time ApexDoc2 is updated
+    # Currently unsupported tags that we may support in the future
     - match: |-
         (?x)
         ((@)
           (
             abstract|access|augments|async|borrows|constructs|copyright|constant|default|
-            event|external|file|fires|generator|ignore|inner|instance|kind|lends|license|
+            date|event|external|file|fires|generator|ignore|inner|instance|kind|lends|license|
             listens|member|memberof|mixes|module|name|namespace|override|package|readonly|
-            since|static|todo|tutorial|variation|virtual
+            since|static|todo|tutorial|variation|virtual|hack
           )
         )(?=\s+)
       captures:
         '1': { name: storage.type.annotation.apex }
         '2': { name: punctuation.accessor.apex }
     # @param paramName
-    - match: (?:(@)(param)\b\s*(([_[:alnum:]]*)))(?=\s+)
+    - match: '((@)(param\b\s*([_[:alnum:]]*)))(?=\s+)'
       captures:
-        '0': { name: punctuation.accessor.apex }
-        '2': { name: storage.type.annotation.apex }
-        '3': { name: keyword.other.class.apex }
-    # @see URL or namePath
+        '1': { name: storage.type.annotation.apex }
+        '2': { name: punctuation.accessor.apex }
+        '3': { name: storage.type.annotation.apex }
+        '4': { name: keyword.other.class.apex }
+    # @see URL, Markdown URL, or namePath
     - match: |-
         (?x)
         (?:
@@ -1778,9 +1779,9 @@ repository:
         '11': { name: variable.other.object.property.apex }
         '12': { name: punctuation.accessor.apex }
         '13': { name: punctuation.accessor.apex }
-    # @example codeExample
-    # Should be the last tag; we can't end matching on next @
-    # because code example could contain Apex annotations
+    # @example codeExample, multiline
+    # should be the last tag, because we can't end matching on
+    # next @ symbol, since code example may contain annotation
     - name: meta.example.apex
       begin: ((@)example)\s+
       end: (?=\*/)
@@ -1788,22 +1789,25 @@ repository:
         '1': { name: storage.type.annotation.apex }
         '2': { name: punctuation.accessor.apex }
       patterns:
-      # Match closing bracket on its own line. Not highlighting with embedded for some reason
-      - match: (?:^\s+(\*)\s+(})(;)?)
+      # match closing bracket on own line, relying only
+      # on embedded code highlighting seems to ignore
+      # this in some themes. Use this rule as a backup.
+      - match: '(?:^\s+(\*)\s+(})(;)?)'
         captures:
           '1': { name: punctuation.definition.comment.apex }
           '2': { name: punctuation.curlybrace.close.apex }
           '3': { name: punctuation.terminator.statement.apex }
-      # Match annotations inside examples, they highlight funny with embedded highlighting
-      - match: (^\s+(\*)\s+@[_[:alpha:]]+\b)
+      # match annotation in code example. Again, embedded
+      # highlighting seems to be a bit wonky on this.
+      - match: '^\s+(\*)\s+(@[_[:alpha:]]+)\b'
         captures:
-          '1': { name: storage.type.annotation.apex }
-          '2': { name: punctuation.definition.comment.apex }
-      # Highlight leading asterisk as comment still
+          '2': { name: storage.type.annotation.apex }
+          '1': { name: punctuation.definition.comment.apex }
+      # ensure leading asterisk not highlighted as Apex
       - match: (^\s+\*\s+)
         captures:
           '0': { name: punctuation.definition.comment.apex }
-      # Highlight Apex example
+      # match and highlight the code example
       - match: '[^\s@*](?:[^*]|\*[^/])*'
         captures:
           '0':
@@ -1814,13 +1818,13 @@ repository:
   apex-doc-break:
     name: meta.tag.apex
     patterns:
-    - match: (<br\s?/?>)
-      captures:
+      - match: (<br\s?/?>)
+        captures:
           '0': { name: punctuation.definition.tag.apex }
 
   apex-doc-inline-code:
     name: meta.example.apex
-    begin: (`)([^\s@*](?:[^*`]|\*[^/])+)
+    begin: '(`)([^\s@*](?:[^*`]|\*[^/])+)'
     beginCaptures:
       '1': { name: punctuation.definition.tag.apex }
       '2': { name: entity.name.tag.apex }
